@@ -1,3 +1,6 @@
+use std::{ thread, sync::{mpsc::{self, Sender}, Arc}};
+
+
 #[derive(Debug,Clone)]
 pub struct PrimeVec(Vec<u64>);
 
@@ -38,13 +41,61 @@ impl PrimeVec {
         self.0.append(&mut from)
     }
 
-    pub fn simple_make_to(&mut self, n :u64) {
+    pub fn simple_make_to(&mut self, n :u64) -> &Self {
         let mut prime_to_find = self.last()+2;
         while prime_to_find < n {
             if self.is_prime(prime_to_find) {
                 self.push(prime_to_find);
             }
             prime_to_find +=2;
+        }
+        return self;
+    }
+
+}
+
+
+pub fn multi_make_to(mut me :PrimeVec, pend :u64, worker_count :usize) -> PrimeVec{
+    let last = me.last();
+    if  last >= pend {
+        return me
+    }
+    if pend > last*last {
+        me = multi_make_to(me, pend/2, worker_count);
+    }
+    let prime_to_find = me.last();
+    let (tx, rx) = mpsc::channel();
+    let mut handles = Vec::new();
+    let primes = Arc::new(me.clone());
+
+    for wid in 0..worker_count {
+        let tx1 = tx.clone();
+        let pp = primes.clone();
+        let h = thread::spawn(move || {
+            worker(pp, tx1, wid, worker_count, prime_to_find, pend)
+        });
+        handles.push(h);
+    }    
+    drop(tx);
+    let mut rdate: Vec<u64>  = Vec::new();
+    for r in rx {
+        rdate.push(r);
+    }
+    for h in handles{
+        h.join().unwrap()
+    }
+    rdate.sort_unstable();
+    // let mut me = *Arc::get_mut(primes).unwrap();
+    me.append(rdate);
+    return me
+}
+
+fn worker(p :Arc<PrimeVec>, tx :Sender<u64>, wid :usize, wnum :usize, pst :u64, pend :u64) {
+    let rst = pst + 2 + 2* wid as u64;
+    let rng = (rst .. pend).step_by(2*wnum);
+    for i in rng {
+        if p.is_prime(i){
+            tx.send(i).unwrap();
         }
     }
 }
