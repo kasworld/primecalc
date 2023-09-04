@@ -9,6 +9,17 @@ impl PrimeVec {
         return PrimeVec(vec![2,3,5]) 
     }
 
+    pub fn simple_make_to(mut self, n :u64) -> Self {
+        let mut prime_to_find = self.last()+2;
+        while prime_to_find < n {
+            if self.is_prime(prime_to_find) {
+                self.push(prime_to_find);
+            }
+            prime_to_find +=2;
+        }
+        return self;
+    }
+
     pub fn is_prime(&self, prime_to_find :u64)->bool {
         let limit = (prime_to_find as f64).sqrt() as u64;
         if self.last() < limit{
@@ -41,16 +52,6 @@ impl PrimeVec {
         self.0.append(&mut from)
     }
 
-    pub fn simple_make_to(&mut self, n :u64) -> &Self {
-        let mut prime_to_find = self.last()+2;
-        while prime_to_find < n {
-            if self.is_prime(prime_to_find) {
-                self.push(prime_to_find);
-            }
-            prime_to_find +=2;
-        }
-        return self;
-    }
 
 }
 
