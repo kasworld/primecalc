@@ -9,6 +9,12 @@ impl PrimeVec {
         return PrimeVec(vec![2,3,5]) 
     }
 
+    pub fn new_with_cap(n :usize) -> Self {
+        let mut rtn = Self::new();
+        rtn.0.reserve(n);
+        return rtn;
+    }
+
     pub fn simple_make_to(mut self, n :u64) -> Self {
         let mut prime_to_find = self.last()+2;
         while prime_to_find < n {
@@ -57,6 +63,7 @@ impl PrimeVec {
 
 
 pub fn multi_make_to(mut me :PrimeVec, pend :u64, worker_count :usize) -> PrimeVec{
+    // println!("{pend}");
     let last = me.last();
     if  last >= pend {
         return me
@@ -78,7 +85,7 @@ pub fn multi_make_to(mut me :PrimeVec, pend :u64, worker_count :usize) -> PrimeV
         handles.push(h);
     }    
     drop(tx);
-    let mut rdate: Vec<u64>  = Vec::new();
+    let mut rdate: Vec<u64> = Vec::with_capacity( (prime_to_find/16) as usize );
     for r in rx {
         rdate.push(r);
     }

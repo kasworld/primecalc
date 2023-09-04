@@ -33,7 +33,8 @@ fn main() {
 }
 
 fn multi2(primes_to_find :u64, worker_count :usize) {
-    let mut primes = prime_vec::PrimeVec::new();
+    // let mut primes = prime_vec::PrimeVec::new();
+    let mut primes = prime_vec::PrimeVec::new_with_cap((primes_to_find/16) as usize);
     let begin = Instant::now();
     primes = prime_vec::multi_make_to(primes, primes_to_find, worker_count);
     let now = Instant::now();
