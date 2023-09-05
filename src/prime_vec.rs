@@ -28,13 +28,37 @@ impl PrimeVec {
 
     pub fn is_prime(&self, prime_to_find :u64)->bool {
         let limit = (prime_to_find as f64).sqrt() as u64;
-        if self.last() < limit{
-            panic!("too large {} < {limit} == sqrt({prime_to_find})  ", self.last())
+        let last = self.last();
+        if last < limit{
+            panic!("too large {last} < {limit} == sqrt({prime_to_find})")
         }
         for p in &self.0 {
             if p > &limit {
                 return true
             }
+            if prime_to_find % p == 0 {
+                return false
+            }
+        }
+        return true
+    }
+
+    pub fn is_prime_over(&self, prime_to_find :u64)->bool {
+        let limit = (prime_to_find as f64).sqrt() as u64;
+        let last_prime_can_find = self.last_prime_can_find();
+        if last_prime_can_find < limit{
+            panic!("too large {last_prime_can_find} < {limit} == sqrt({prime_to_find})")
+        }
+        for p in &self.0 {
+            if p > &limit {
+                return true
+            }
+            if prime_to_find % p == 0 {
+                return false
+            }
+        }
+        let last = self.last();
+        for p in (last+2..limit).step_by(2) {
             if prime_to_find % p == 0 {
                 return false
             }
@@ -53,6 +77,11 @@ impl PrimeVec {
     pub fn last(&self) -> u64 {
         return self.0.last().copied().unwrap()
     }
+    
+    pub fn last_prime_can_find(&self) -> u64 {
+        let last = self.last();
+        return last*last;
+    }
 
     pub fn append(&mut self, mut from :Vec<u64>) {
         self.0.append(&mut from)
@@ -68,7 +97,7 @@ pub fn multi_make_to(mut me :PrimeVec, pend :u64, worker_count :usize) -> PrimeV
     if  last >= pend {
         return me
     }
-    if pend > last*last {
+    if pend > me.last_prime_can_find() {
         me = multi_make_to(me, pend/2, worker_count);
     }
     let prime_to_find = me.last();
