@@ -14,18 +14,18 @@ fn main() {
         Some(arg) => match arg.trim().parse() {
             Ok(num) => num,
             Err(err) => {
-                println!("num to find {}, set to 0xffff",err);
-                0xffff
+                println!("num to find {}, set to 100000",err);
+                100000
             },
         },
-        None => 0xffff,
+        None => 100000,
     };
 
-    let thread_count :usize = match args.next() {
+    let worker_count :usize = match args.next() {
         Some(arg) => match arg.trim().parse() {
             Ok(num) => num,
             Err(err) => {
-                println!("thread count {}, set to 0", err);
+                println!("work thread count {}, set to 0", err);
                 0
             }
         },
@@ -34,13 +34,13 @@ fn main() {
 
     match args.next() {
         Some(_) => { // do find
-            println!("multi thread prime find, downward from {primes_to_find}, thread {thread_count}");
-            multi_find(primes_to_find, thread_count);
+            println!("multi thread prime find, downward from {primes_to_find}, work thread {worker_count}");
+            multi_find(primes_to_find, worker_count);
         },
         None => { // do calc 
-            if thread_count > 0 {
-                println!("multi thread prime table, upto {primes_to_find}, thread {thread_count}");
-                multi_calc(primes_to_find, thread_count);
+            if worker_count > 0 {
+                println!("multi thread prime table, upto {primes_to_find}, work thread {worker_count}");
+                multi_calc(primes_to_find, worker_count);
             } else {
                 println!("single thread prime table, upto {primes_to_find}");
                 single(primes_to_find);
@@ -50,11 +50,11 @@ fn main() {
 
 }
 
-fn multi_find(primes_to_find :prime_vec::Element, thread_count :usize) {
+fn multi_find(primes_to_find :prime_vec::Element, worker_count :usize) {
     let primes_sqrt =  sqrt(primes_to_find); 
     let mut primes = prime_vec::PrimeVec::new_with_cap((primes_sqrt/16) as usize);
     let begin = Instant::now();
-    primes = prime_vec::multi_make_to(primes, primes_sqrt, thread_count);
+    primes = prime_vec::multi_make_to(primes, primes_sqrt, worker_count);
     let now = Instant::now();
     println!("{} {} {:?}",primes.len(), primes.last(), now-begin);
     for p in (2..=primes_to_find).rev() {
@@ -67,10 +67,10 @@ fn multi_find(primes_to_find :prime_vec::Element, thread_count :usize) {
     println!("{} {} {:?}",primes.len(), primes.last(), now-begin);
 }
 
-fn multi_calc(primes_to_find :prime_vec::Element, thread_count :usize) {
+fn multi_calc(primes_to_find :prime_vec::Element, worker_count :usize) {
     let mut primes = prime_vec::PrimeVec::new_with_cap((primes_to_find/16) as usize);
     let begin = Instant::now();
-    primes = prime_vec::multi_make_to(primes, primes_to_find, thread_count);
+    primes = prime_vec::multi_make_to(primes, primes_to_find, worker_count);
     let now = Instant::now();
     println!("{} {} {:?}",primes.len(), primes.last(), now-begin);
 }

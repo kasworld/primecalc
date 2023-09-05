@@ -98,25 +98,25 @@ pub fn sqrt(v :Element)->Element{
     return (v as f64).sqrt() as Element
 }
 
-pub fn multi_make_to(mut me :PrimeVec, pend :Element, thread_count :usize) -> PrimeVec{
+pub fn multi_make_to(mut me :PrimeVec, pend :Element, worker_count :usize) -> PrimeVec{
     // println!("{pend}");
     let last = me.last();
     if  last >= pend {
         return me
     }
     if pend > me.last_prime_can_find() {
-        me = multi_make_to(me, pend/2, thread_count);
+        me = multi_make_to(me, pend/2, worker_count);
     }
     let prime_to_find = me.last();
     let (tx, rx) = mpsc::channel();
     let mut handles = Vec::new();
     let primes = Arc::new(me.clone());
 
-    for wid in 0..thread_count {
+    for wid in 0..worker_count {
         let tx1 = tx.clone();
         let pp = primes.clone();
         let h = thread::spawn(move || {
-            worker(pp, tx1, wid, thread_count, prime_to_find, pend)
+            worker(pp, tx1, wid, worker_count, prime_to_find, pend)
         });
         handles.push(h);
     }    
