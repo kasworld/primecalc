@@ -27,7 +27,7 @@ impl PrimeVec {
     }
 
     pub fn is_prime(&self, prime_to_find :u64)->bool {
-        let limit = (prime_to_find as f64).sqrt() as u64;
+        let limit = sqrt(prime_to_find);
         let last = self.last();
         if last < limit{
             panic!("too large {last} < {limit} == sqrt({prime_to_find})")
@@ -44,7 +44,7 @@ impl PrimeVec {
     }
 
     pub fn is_prime_over(&self, prime_to_find :u64)->bool {
-        let limit = (prime_to_find as f64).sqrt() as u64;
+        let limit = sqrt(prime_to_find);
         let last_prime_can_find = self.last_prime_can_find();
         if last_prime_can_find < limit{
             panic!("too large {last_prime_can_find} < {limit} == sqrt({prime_to_find})")
@@ -90,6 +90,10 @@ impl PrimeVec {
 
 }
 
+
+pub fn sqrt(v :u64)->u64{
+    return (v as f64).sqrt() as u64
+}
 
 pub fn multi_make_to(mut me :PrimeVec, pend :u64, worker_count :usize) -> PrimeVec{
     // println!("{pend}");
