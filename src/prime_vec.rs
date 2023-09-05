@@ -17,7 +17,7 @@ impl PrimeVec {
 
     pub fn simple_make_to(mut self, n :u64) -> Self {
         let mut prime_to_find = self.last()+2;
-        while prime_to_find < n {
+        while prime_to_find <= n {
             if self.is_prime(prime_to_find) {
                 self.push(prime_to_find);
             }
