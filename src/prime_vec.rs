@@ -58,7 +58,7 @@ impl PrimeVec {
             }
         }
         let last = self.last();
-        for p in (last+2..limit).step_by(2) {
+        for p in (last+2..=limit).step_by(2) {
             if prime_to_find % p == 0 {
                 return false
             }
