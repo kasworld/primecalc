@@ -28,7 +28,7 @@ fn main() {
 
     match args.next() {
         Some(_) => { // do find
-            println!("multi thread prime fine downward from {primes_to_find} worker {worker_count}");
+            println!("multi thread prime find downward from {primes_to_find} worker {worker_count}");
             multi_find(primes_to_find, worker_count);
         },
         None => { // do calc 

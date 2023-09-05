@@ -26,6 +26,7 @@ impl PrimeVec {
         return self;
     }
 
+    // in table
     pub fn is_prime(&self, prime_to_find :u64)->bool {
         let limit = sqrt(prime_to_find);
         let last = self.last();
@@ -43,6 +44,7 @@ impl PrimeVec {
         return true
     }
 
+    // over table 
     pub fn is_prime_over(&self, prime_to_find :u64)->bool {
         let limit = sqrt(prime_to_find);
         let last_prime_can_find = self.last_prime_can_find();
@@ -140,3 +142,18 @@ fn worker(p :Arc<PrimeVec>, tx :Sender<u64>, wid :usize, wnum :usize, pst :u64, 
         }
     }
 }
+
+// no table use 
+pub fn is_prime(prime_to_find :u64)->bool {
+    if prime_to_find % 2 == 0 {
+        return prime_to_find == 2;
+    }
+    let limit = sqrt(prime_to_find);
+    for p in (3..=limit).step_by(2) {
+        if prime_to_find % p == 0 {
+            return false
+        }
+    }
+    return true
+}
+
