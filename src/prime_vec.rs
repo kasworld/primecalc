@@ -221,3 +221,9 @@ pub fn is_prime(prime_to_find: Element) -> bool {
     }
     return true;
 }
+
+pub fn get_thread_count() -> usize{
+    let count = thread::available_parallelism().unwrap().get();
+    assert!(count >= 1_usize);
+    return count;
+}
