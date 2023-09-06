@@ -1,5 +1,5 @@
-use std::io::prelude::*;
-use std::{ thread, sync::{mpsc::{self, Sender}, Arc}, fs::File, io::{Write, BufReader}};
+use std::{ thread, sync::{mpsc::{self, Sender}, Arc}, fs::File, io::{Read, Write}};
+use std::{mem, slice};
 
 pub type Element = u64;
 
@@ -94,32 +94,55 @@ impl PrimeVec {
     const FILENAME :&str = "primes.data";
 
     pub fn save(self) {
-        let mut file = File::create(Self::FILENAME).unwrap();
-        for v in self.0 {
-            writeln!(file, "{v}").unwrap();
-        }
+        let mut f = File::create(Self::FILENAME).unwrap();
+        f.write_all(as_u8_slice(&self.0)).unwrap();
+    }
+    
+    pub fn load(&mut self) {
+        let mut f = match File::open(Self::FILENAME) {
+            Ok(f) => f,
+            Err(err) => {
+                println!("{err}");
+                return
+            }
+        };
+        let mut bytes = Vec::new();
+    
+        f.read_to_end(&mut bytes).unwrap();
+    
+        self.0 = from_u8(bytes)
     }
 
-    pub fn read(&mut self) {
-        let mut file = File::open(Self::FILENAME).unwrap();
-        let buf_reader = BufReader::new(&mut file);
-        let tocollect :Vec<String> = buf_reader
-            .lines()
-            .map(|result| result.unwrap())
-            .take_while(|line| !line.is_empty())
-            .collect();
-        for s in tocollect {
-            let v = match s.trim().parse() {
-                Ok(num) => num,
-                Err(err) => {
-                    println!("unknown {s} {err}");
-                    continue;
-                }
-            };
-            self.0.push(v);
-        }
-    }
+}
 
+
+fn as_u8_slice(v: &[Element]) -> &[u8] {
+    let element_size = mem::size_of::<Element>();
+    unsafe { slice::from_raw_parts(v.as_ptr() as *const u8, v.len() * element_size) }
+}
+
+fn from_u8(v: Vec<u8>) -> Vec<Element> {
+    let data = v.as_ptr();
+    let len = v.len();
+    let capacity = v.capacity();
+    let element_size = mem::size_of::<Element>();
+
+    // Make sure we have a proper amount of capacity (may be overkill)
+    assert_eq!(capacity % element_size, 0);
+    // Make sure we are going to read a full chunk of stuff
+    assert_eq!(len % element_size, 0);
+
+    unsafe {
+        // Don't allow the current vector to be dropped
+        // (which would invalidate the memory)
+        mem::forget(v);
+
+        Vec::from_raw_parts(
+            data as *mut Element,
+            len / element_size,
+            capacity / element_size,
+        )
+    }
 }
 
 
