@@ -1,4 +1,5 @@
-use std::{ thread, sync::{mpsc::{self, Sender}, Arc}};
+use std::io::prelude::*;
+use std::{ thread, sync::{mpsc::{self, Sender}, Arc}, fs::File, io::{Write, BufReader}};
 
 pub type Element = u64;
 
@@ -90,6 +91,34 @@ impl PrimeVec {
         self.0.append(&mut from)
     }
 
+    const FILENAME :&str = "primes.data";
+
+    pub fn save(self) {
+        let mut file = File::create(Self::FILENAME).unwrap();
+        for v in self.0 {
+            writeln!(file, "{v}").unwrap();
+        }
+    }
+
+    pub fn read(&mut self) {
+        let mut file = File::open(Self::FILENAME).unwrap();
+        let buf_reader = BufReader::new(&mut file);
+        let tocollect :Vec<String> = buf_reader
+            .lines()
+            .map(|result| result.unwrap())
+            .take_while(|line| !line.is_empty())
+            .collect();
+        for s in tocollect {
+            let v = match s.trim().parse() {
+                Ok(num) => num,
+                Err(err) => {
+                    println!("unknown {s} {err}");
+                    continue;
+                }
+            };
+            self.0.push(v);
+        }
+    }
 
 }
 

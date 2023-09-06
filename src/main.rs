@@ -65,6 +65,9 @@ fn multi_find(primes_to_find :prime_vec::Element, worker_count :usize) {
     }
     let now = Instant::now();
     println!("{} {} {:?}",primes.len(), primes.last(), now-begin);
+    // primes.save();
+    // let now = Instant::now();
+    // println!("{:?}", now-begin);
 }
 
 fn multi_calc(primes_to_find :prime_vec::Element, worker_count :usize) {
@@ -73,6 +76,9 @@ fn multi_calc(primes_to_find :prime_vec::Element, worker_count :usize) {
     primes = prime_vec::multi_make_to(primes, primes_to_find, worker_count);
     let now = Instant::now();
     println!("{} {} {:?}",primes.len(), primes.last(), now-begin);
+    // primes.save();
+    // let now = Instant::now();
+    // println!("{:?}", now-begin);
 }
 
 
