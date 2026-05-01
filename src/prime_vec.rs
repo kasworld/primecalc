@@ -1,13 +1,13 @@
 use std::{
     fs::File,
     io::{Read, Write},
+    mem, slice,
     sync::{
         mpsc::{self, Sender},
         Arc,
     },
     thread,
 };
-use std::{mem, slice};
 
 pub type Element = u64;
 
@@ -209,20 +209,20 @@ fn worker(
 }
 
 // no table use
-pub fn is_prime(prime_to_find: Element) -> bool {
-    if prime_to_find % 2 == 0 {
-        return prime_to_find == 2;
-    }
-    let limit = sqrt(prime_to_find);
-    for p in (3..=limit).step_by(2) {
-        if prime_to_find % p == 0 {
-            return false;
-        }
-    }
-    return true;
-}
+// pub fn is_prime(prime_to_find: Element) -> bool {
+//     if prime_to_find % 2 == 0 {
+//         return prime_to_find == 2;
+//     }
+//     let limit = sqrt(prime_to_find);
+//     for p in (3..=limit).step_by(2) {
+//         if prime_to_find % p == 0 {
+//             return false;
+//         }
+//     }
+//     return true;
+// }
 
-pub fn get_thread_count() -> usize{
+pub fn get_thread_count() -> usize {
     let count = thread::available_parallelism().unwrap().get();
     assert!(count >= 1_usize);
     return count;

@@ -8,7 +8,7 @@ mod prime_vec;
 fn main() {
     let mut args = env::args();
 
-    let prgname =  args.next().unwrap();
+    let prgname = args.next().unwrap();
 
     let primes_to_find: prime_vec::Element = match args.next() {
         Some(arg) => match arg.trim().parse() {
@@ -59,7 +59,6 @@ fn help(prgname: String) {
     println!("cmd : single : single thread make prime table upto number");
     println!("cmd : calc   : multi thread make prime table upto number");
     println!("cmd : find   : multi thread find prime downward from number, make table if need");
-
 }
 
 fn multi_find(primes_to_find: prime_vec::Element, worker_count: usize) {
