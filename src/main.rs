@@ -40,6 +40,12 @@ fn main() {
                     );
                     multi_calc(primes_to_find, worker_count);
                 }
+                "rayon" => {
+                    println!(
+                        "rayon_find make prime table, upto {primes_to_find}, work thread {worker_count}"
+                    );
+                    rayon_find(primes_to_find);
+                }
                 _ => {
                     // print help
                     help(prgname);
@@ -58,6 +64,7 @@ fn help(prgname: String) {
     println!("number : find downward or make table to number");
     println!("cmd : single : single thread make prime table upto number");
     println!("cmd : calc   : multi thread make prime table upto number");
+    println!("cmd : rayon   : rayon_find make prime table upto number");
     println!("cmd : find   : multi thread find prime downward from number, make table if need");
 }
 
@@ -154,6 +161,42 @@ fn single(primes_to_find: prime_vec::Element) {
     println!(
         "after save {} {:?}",
         prime_vec::get_filename(),
+        Instant::now() - begin
+    );
+}
+
+
+use rayon::prelude::*;
+
+fn rayon_find(primes_to_find: prime_vec::Element) {
+    let mut primes = vec![2];
+    // let maximum: u64 = 1_000_000;
+    let begin = Instant::now();
+
+    loop {
+        let mut new_primes = vec![];
+        let last_prime = *primes.last().unwrap();
+        if last_prime > primes_to_find {
+            break;
+        }
+
+        new_primes.par_extend((last_prime..last_prime*2)
+            .into_par_iter()
+            .filter(|candidate| {
+                let square_root = (*candidate as f64).sqrt() as u64 + 1;
+                primes
+                    .iter()
+                    .take_while(|p| p <= &&square_root)
+                    .all(|p| candidate % p != 0)
+            })
+        );
+
+        primes.append(&mut new_primes);
+    }
+    println!(
+        "after rayon_find {} {} {:?}",
+        primes.len(),
+        *primes.last().unwrap(),
         Instant::now() - begin
     );
 }
